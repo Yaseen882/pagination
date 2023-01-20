@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:interview/avatar_widget.dart';
+import 'package:interview/custom_widgets/avatar_widget.dart';
+import 'package:interview/custom_widgets/display_text.dart';
 import 'package:interview/data/user.dart';
 import 'package:interview/data/mock_data.dart';
 
@@ -13,68 +14,67 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-   late TextEditingController searchController;
+  late  TextEditingController searchController;
   late List<User?> users;
-  late List<User?> filteredUsers;
+  late List<User?> listOfUserForFilter;
+
 
   @override
   void initState() {
     super.initState();
     users = User.fromJsonToList(allData());
-    filteredUsers = users;
+    listOfUserForFilter = users;
     searchController = TextEditingController();
-    searchController.addListener(() {
+    searchController.addListener(()  {
+
       setState(() {
-        users = _filterList(searchController.text.toString());
+        users =  listOfFilteredUser(searchString : searchController.text.toString());
       });
     });
   }
 
   @override
   void dispose() {
+    searchController.dispose();
     super.dispose();
   }
-  List<User> _filterList(String value) {
-    List<User> searchList = [];
-    for (int i = 0; i < filteredUsers.length; i++) {
-      if (filteredUsers[i]!
-          .firstName
-          .toString()
-          .toLowerCase()
-          .contains(value.toLowerCase()) ||
-          filteredUsers[i]!
+
+  List<User?> listOfFilteredUser({required String searchString}) {
+
+     List<User?> searchList = [];
+    for (int i = 0; i < listOfUserForFilter.length; i++) {
+      if (listOfUserForFilter[i]!
+              .firstName
+              .toString()
+              .toLowerCase()
+              .contains(searchString.toLowerCase()) ||
+          listOfUserForFilter[i]!
               .lastName
               .toString()
               .toLowerCase()
-              .contains(value.toLowerCase()) ||
-          filteredUsers[i]!
+              .contains(searchString.toLowerCase()) ||
+          listOfUserForFilter[i]!
               .email
               .toString()
               .toLowerCase()
-              .contains(value.toLowerCase()) ||
-          filteredUsers[i]!
+              .contains(searchString.toLowerCase()) ||
+          listOfUserForFilter[i]!
               .role
               .toString()
               .toLowerCase()
-              .contains(value.toLowerCase())) {
-        searchList.add(filteredUsers[i]!);
+              .contains(searchString.toLowerCase())) {
+        searchList.add(listOfUserForFilter[i]!);
       }
     }
     return searchList;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-     users = User.fromJsonToList(allData());
-
-    _getUserAvatar(url) {
-      return CircleAvatar(backgroundImage: NetworkImage(url));
-    }
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(widget.title),
       ),
       body: Column(
@@ -101,25 +101,38 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Flexible(
             child: ListView.builder(
+              reverse: true,
               itemCount: users.length,
               itemBuilder: (context, index) {
                 User? item = users[index];
                 return ListTile(
-                  leading: CustomAvatarWidget(networkImageUrl: '${item?.avatar}',),
-                  title: Text('${item?.firstName} ${item?.lastName}'),
-                  subtitle: Text('${item?.role}'),
+                  leading: CustomAvatarWidget(
+                    networkImageUrl: '${item?.avatar}',
+                  ),
+                  title: DisplayText(label:'${item?.firstName} ${item?.lastName}'),
+                  subtitle: DisplayText(label:'${item?.role}'),
                 );
               },
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-            var newUser = User(id: "b32ec56c-21bb-4b7b-a3a0-635b8bca1f9d", avatar: null, firstName: "James", lastName: "May", email: "ssaull1c@tripod.com", role: "Developer");
+          var newUser = User(
+              id: "1123444",
+              avatar: '',
+              firstName: "Khan",
+              lastName: "Steven",
+              email: "st123@gmail.com",
+              role: "Flutter Developer");
+
+          setState(() {
+            users.add(newUser);
+            listOfUserForFilter.add(newUser);
+          });
         },
-        tooltip: 'Add new',
-        child: Icon(Icons.add),
+        label: Row(children: [Icon(Icons.add), SizedBox(width: 5,),DisplayText( label: 'User')],),
       ),
     );
   }
