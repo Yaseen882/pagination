@@ -43,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
      List<User?> searchList = [];
     for (int i = 0; i < listOfUserForFilter.length; i++) {
-      //
+
       if (listOfUserForFilter[i]!
               .firstName
               .toString()
