@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:interview/avatar_widget.dart';
 import 'package:interview/data/user.dart';
 import 'package:interview/data/mock_data.dart';
 
@@ -12,24 +13,61 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final searchController = TextEditingController();
+   late TextEditingController searchController;
+  late List<User?> users;
+  late List<User?> filteredUsers;
 
   @override
   void initState() {
     super.initState();
-    searchController.addListener(_filterList);
+    users = User.fromJsonToList(allData());
+    filteredUsers = users;
+    searchController = TextEditingController();
+    searchController.addListener(() {
+      setState(() {
+        users = _filterList(searchController.text.toString());
+      });
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
   }
+  List<User> _filterList(String value) {
+    List<User> searchList = [];
+    for (int i = 0; i < filteredUsers.length; i++) {
+      if (filteredUsers[i]!
+          .firstName
+          .toString()
+          .toLowerCase()
+          .contains(value.toLowerCase()) ||
+          filteredUsers[i]!
+              .lastName
+              .toString()
+              .toLowerCase()
+              .contains(value.toLowerCase()) ||
+          filteredUsers[i]!
+              .email
+              .toString()
+              .toLowerCase()
+              .contains(value.toLowerCase()) ||
+          filteredUsers[i]!
+              .role
+              .toString()
+              .toLowerCase()
+              .contains(value.toLowerCase())) {
+        searchList.add(filteredUsers[i]!);
+      }
+    }
+    return searchList;
+  }
 
-  _filterList() {}
+
 
   @override
   Widget build(BuildContext context) {
-    var users = User.fromJsonToList(allData());
+     users = User.fromJsonToList(allData());
 
     _getUserAvatar(url) {
       return CircleAvatar(backgroundImage: NetworkImage(url));
@@ -46,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
+                controller: searchController,
                 autofocus: true,
                 decoration: InputDecoration(
                   hintText: 'Search...',
@@ -64,10 +103,11 @@ class _MyHomePageState extends State<MyHomePage> {
             child: ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) {
-                final item = users[index];
+                User? item = users[index];
                 return ListTile(
-                  title: Text('name'),
-                  subtitle: Text('role'),
+                  leading: CustomAvatarWidget(networkImageUrl: '${item?.avatar}',),
+                  title: Text('${item?.firstName} ${item?.lastName}'),
+                  subtitle: Text('${item?.role}'),
                 );
               },
             ),

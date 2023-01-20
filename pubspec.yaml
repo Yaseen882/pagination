@@ -14,6 +14,9 @@ dependencies:
   mock_data: ^2.0.0
 
   cupertino_icons: ^1.0.2
+  # cache network image
+  cached_network_image: ^3.2.3
+  font_awesome_flutter: ^10.3.0
 
 dev_dependencies:
   flutter_test:
